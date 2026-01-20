@@ -8,14 +8,10 @@ public class ConsoleMenu {
 
     private final CommandDispatcher dispatcher;
     private final ConsoleIO io;
-    //private final BookFormatter formatter;
-    //private final BookPrompter prompter;
 
     public ConsoleMenu(ConsoleIO io,CommandDispatcher dispatcher, BookFormatter formatter, BookPrompter prompter) {
         this.io = io;
         this.dispatcher = dispatcher;
-        //this.formatter = formatter;
-        //this.prompter = prompter;
     }
 
     public void run(){

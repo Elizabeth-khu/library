@@ -11,12 +11,20 @@ repositories {
 }
 
 dependencies {
-    // Spring DI (без Spring Boot)
+    // Spring DI (without Spring Boot)
     implementation 'org.springframework:spring-context:6.2.7'
 
     // Jackson CSV
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.17.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+
+    // Tests
+    testImplementation platform("org.junit:junit-bom:5.10.2")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 java {

@@ -1,10 +1,7 @@
 package com.example.library.config;
 
 import com.example.library.ui.MenuAction;
-import com.example.library.ui.command.Command;
-import com.example.library.ui.command.CreateBookCommand;
-import com.example.library.ui.command.DisplayBooksCommand;
-import com.example.library.ui.command.EditBookCommand;
+import com.example.library.ui.command.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,12 +15,14 @@ public class CommandConfig {
     public Map<MenuAction, Command> commands(
             DisplayBooksCommand display,
             CreateBookCommand create,
-            EditBookCommand edit
+            EditBookCommand edit,
+            DeleteBookCommand delete
     ) {
         Map<MenuAction, Command> map = new EnumMap<>(MenuAction.class);
         map.put(MenuAction.DISPLAY, display);
         map.put(MenuAction.CREATE, create);
         map.put(MenuAction.EDIT, edit);
+        map.put(MenuAction.DELETE, delete);
         return map;
     }
 }

@@ -46,7 +46,11 @@ public class CsvBooksStorage implements BooksStorage{
     }
 
     private long nextId(List<Book> books) {
-        return books.size() + 1;
+        long max = books.stream()
+                .mapToLong(Book::getId)
+                .max()
+                .orElse(0L);
+        return max + 1;
     }
 
     @Override
@@ -65,8 +69,16 @@ public class CsvBooksStorage implements BooksStorage{
 
     @Override
     public boolean delete(long id) {
-        return false;
+        List<Book> currentBooks = reader.readAllBooks();
+        List<Book> updatedBooks = new ArrayList<>(currentBooks);
+
+        boolean removed = updatedBooks.removeIf(book -> book.getId() == id);
+        if(!removed) return false;
+
+        writer.writeAllBooks(updatedBooks);
+        return true;
     }
+
 
     private boolean replace(List<Book> books, long id, BookDraft bookDraft) {
         for(int i = 0; i < books.size(); ++i) {

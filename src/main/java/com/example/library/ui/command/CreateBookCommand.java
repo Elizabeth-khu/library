@@ -1,4 +1,42 @@
 package com.example.library.ui.command;
 
-public class CreateBookCommand {
+import com.example.library.domain.BookValidator;
+import com.example.library.storage.BooksStorage;
+import com.example.library.ui.BookPrompter;
+import com.example.library.ui.ConsoleIO;
+import org.springframework.stereotype.Component;
+
+import java.util.logging.Logger;
+
+@Component
+public class CreateBookCommand implements Command {
+
+    private static final Logger log = Logger.getLogger(CreateBookCommand.class.getName());
+
+    private final BooksStorage  storage;
+    private final BookPrompter prompter;
+    private final BookValidator validator;
+    private final ConsoleIO consoleIO;
+
+    public CreateBookCommand(BooksStorage storage, BookPrompter prompter, BookValidator validator, ConsoleIO consoleIO) {
+        this.storage = storage;
+        this.prompter = prompter;
+        this.validator = validator;
+        this.consoleIO = consoleIO;
+    }
+
+    @Override
+    public void execute() {
+        log.info("Create Book");
+        try{
+            var draft = validator.validateAndNormalize(prompter.promptForCreate());
+            var created = storage.create(draft);
+            consoleIO.println("Created book with id=" + created.getId());
+        } catch (RuntimeException e) {
+            consoleIO.println("Error" + e.getMessage());
+            log.warning("Create failed: " + e.getMessage());
+        }
+    }
+
+
 }

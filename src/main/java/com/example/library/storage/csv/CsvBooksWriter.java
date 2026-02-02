@@ -3,32 +3,40 @@ package com.example.library.storage.csv;
 import com.example.library.domain.Book;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
+@Component
 public class CsvBooksWriter {
 
-    private final CsvMapper mapper;
-    private final CsvSchema schema;
-    private final File file;
+    private static final CsvSchema SCHEMA =
+            CsvSchema.emptySchema().withHeader();
 
-    public CsvBooksWriter(CsvMapper mapper, CsvSchema schema, File file) {
+    private final CsvMapper mapper;
+    private final Path booksFile;
+
+    public CsvBooksWriter(CsvMapper mapper, Path booksFile) {
         this.mapper = mapper;
-        this.schema = schema;
-        this.file = file;
+        this.booksFile = booksFile;
     }
 
-    public void writeAll(List<Book> books){
-        try{
-            mapper
-                    .writerFor(Book.class)
-                    .with(schema)
-                    .writeValues(file)
-                    .writeAll(books);
-        }catch (IOException e){
-            throw new RuntimeException("Failed to write books to CSV" + e);
+    public void writeAllBooks(List<Book> books) {
+        try {
+            Files.createDirectories(booksFile.getParent());
+
+            try (var writer = Files.newBufferedWriter(booksFile)) {
+                mapper
+                        .writerFor(Book.class)
+                        .with(SCHEMA)
+                        .writeValues(writer)
+                        .writeAll(books);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to write books CSV", e);
         }
     }
 }

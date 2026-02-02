@@ -1,5 +1,6 @@
 package com.example.library.ui;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 public enum MenuAction {
@@ -25,12 +26,10 @@ public enum MenuAction {
     }
 
     public static Optional<MenuAction> from(String input) {
-        if (input == null) return Optional.empty();
-        String normalized = input.trim();
-        for (MenuAction a : values()) {
-            if (a.code.equals(normalized)) return Optional.of(a);
-        }
-        return Optional.empty();
+        String clearInput = input == null ? "" : input.trim();
+        return Arrays.stream(values())
+                .filter(action -> action.code.equals(clearInput))
+                .findFirst();
     }
 
 }

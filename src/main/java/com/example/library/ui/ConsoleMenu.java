@@ -3,9 +3,13 @@ package com.example.library.ui;
 import com.example.library.ui.command.CommandDispatcher;
 import org.springframework.stereotype.Component;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Component
 public class ConsoleMenu {
 
+    private static final Logger log = Logger.getLogger(ConsoleMenu.class.getName());
     private final CommandDispatcher dispatcher;
     private final ConsoleIO io;
 
@@ -14,13 +18,25 @@ public class ConsoleMenu {
         this.dispatcher = dispatcher;
     }
 
-    public void run(){
-        while(true){
+    public void run() {
+        while (true) {
             printMenu();
-            MenuAction action = readAction();
-            if(action == MenuAction.EXIT) return;
-            dispatcher.dispatch(action);
+            try {
+                MenuAction action = readAction();
+                if (action == MenuAction.EXIT) {
+                    return;
+                }
+                dispatcher.dispatch(action);
+            } catch (RuntimeException e) {
+                io.println("Error: " + safeMessage(e));
+                log.log(Level.WARNING, "Menu action failed", e);
+            }
         }
+    }
+
+    private String safeMessage(RuntimeException e) {
+        String msg = e.getMessage();
+        return (msg == null || msg.isBlank()) ? e.getClass().getSimpleName() : msg;
     }
 
     private MenuAction readAction() {

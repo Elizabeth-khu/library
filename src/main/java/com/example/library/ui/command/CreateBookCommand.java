@@ -27,15 +27,10 @@ public class CreateBookCommand implements Command {
 
     @Override
     public void execute() {
-        log.info("Create Book");
-        try{
-            var draft = validator.validateAndNormalize(prompter.promptForCreate());
-            var created = storage.create(draft);
-            consoleIO.println("Created book with id=" + created.getId());
-        } catch (RuntimeException e) {
-            consoleIO.println("Error" + e.getMessage());
-            log.warning("Create failed: " + e.getMessage());
-        }
+        log.info("Create book");
+        var draft = validator.validateAndNormalize(prompter.promptForCreate());
+        var created = storage.create(draft);
+        consoleIO.println("Created book with id=" + created.getId());
     }
 
 

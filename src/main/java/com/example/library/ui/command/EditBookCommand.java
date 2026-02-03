@@ -2,7 +2,6 @@ package com.example.library.ui.command;
 
 import com.example.library.domain.BookValidator;
 import com.example.library.storage.BooksStorage;
-import com.example.library.ui.BookFormatter;
 import com.example.library.ui.BookPrompter;
 import com.example.library.ui.ConsoleIO;
 import org.springframework.stereotype.Component;
@@ -28,33 +27,26 @@ public class EditBookCommand implements Command {
 
     @Override
     public void execute() {
-        log.info("Enter book");
+        log.info("Edit book");
+        long id = readId();
+
+        var existing = booksStorage.findById(id);
+        if (existing.isEmpty()) {
+            consoleIO.println("Book not found: id=" + id);
+            return;
+        }
+
+        var draft = bookValidator.validateAndNormalize(bookPrompter.promptForEdit(existing.get()));
+        booksStorage.update(id, draft).orElseThrow(() -> new IllegalStateException("Book not found: id=" + id));
+        consoleIO.println("Updated book id=" + id);
+    }
+
+    private long readId() {
+        String raw = consoleIO.readLine("Enter id to edit: ");
         try {
-            long id = readId("Enter id to edit: ");
-
-            var existing = booksStorage.findById(id);
-            if (existing.isEmpty()) {
-                consoleIO.println("Book not found: id=" + id);
-                return;
-            }
-
-            var draft = bookValidator.validateAndNormalize(bookPrompter.promptForEdit(existing.get()));
-            var updated = booksStorage.update(id, draft);
-
-            consoleIO.println(updated.isPresent() ? "Updated book id=" + id : "Book not found: id=" + id);
-        }catch(RuntimeException e) {
-            consoleIO.println("Error: " + e.getMessage());
-            log.warning("Edit book failed: " + e.getMessage());
-        }
-    }
-
-    private long readId(String prompt) {
-        String raw = consoleIO.readLine(prompt);
-        try{
             return Long.parseLong(raw.trim());
-        }catch (Exception e){
-            throw new IllegalArgumentException("Invalid id: " + raw);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid id: " + raw, e);
         }
     }
-
 }

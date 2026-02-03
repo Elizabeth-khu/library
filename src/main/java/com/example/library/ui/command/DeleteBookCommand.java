@@ -22,19 +22,14 @@ public class DeleteBookCommand implements Command {
     @Override
     public void execute() {
         log.info("Delete book");
-        try{
-            long id = readId("Enter id to delete: ");
-            boolean deleted = booksStorage.delete(id);
-            consoleIO.println(deleted ? "Deleted book id=" + id : "Book not found: id=" + id);
-        }catch(RuntimeException e) {
-            consoleIO.println("Error: " + e.getMessage());
-            log.warning("Delete book failed: " + e.getMessage());
-        }
+        long id = readId();
+        boolean deleted = booksStorage.delete(id);
+        consoleIO.println(deleted ? "Deleted book id=" + id : "Book not found: id=" + id);
     }
 
-    private long readId(String prompt) {
-        String raw = consoleIO.readLine(prompt);
-        try{
+    private long readId() {
+        String raw = consoleIO.readLine("Enter id to delete: ");
+        try {
             return Long.parseLong(raw.trim());
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid id: " + raw, e);

@@ -13,8 +13,13 @@ import java.util.List;
 @Component
 public class CsvBooksWriter {
 
-    private static final CsvSchema SCHEMA =
-            CsvSchema.emptySchema().withHeader();
+    private static final CsvSchema HEADER_SCHEMA = CsvSchema.builder()
+            .addColumn("id")
+            .addColumn("title")
+            .addColumn("author")
+            .addColumn("description")
+            .setUseHeader(true)
+            .build();
 
     private final CsvMapper mapper;
     private final Path booksFile;
@@ -29,9 +34,8 @@ public class CsvBooksWriter {
             Files.createDirectories(booksFile.getParent());
 
             try (var writer = Files.newBufferedWriter(booksFile)) {
-                mapper
-                        .writerFor(Book.class)
-                        .with(SCHEMA)
+                mapper.writerFor(Book.class)
+                        .with(HEADER_SCHEMA)
                         .writeValues(writer)
                         .writeAll(books);
             }

@@ -1,6 +1,7 @@
 package com.example.library.ui.command;
 
 import com.example.library.domain.BookValidator;
+import com.example.library.i18n.Translator;
 import com.example.library.storage.BooksStorage;
 import com.example.library.ui.BookPrompter;
 import com.example.library.ui.ConsoleIO;
@@ -17,12 +18,14 @@ public class EditBookCommand implements Command {
     private final BookPrompter bookPrompter;
     private final BookValidator bookValidator;
     private final ConsoleIO consoleIO;
+    private final Translator translator;
 
-    public EditBookCommand(BooksStorage booksStorage, BookPrompter bookPrompter, BookValidator bookValidator, ConsoleIO consoleIO) {
+    public EditBookCommand(BooksStorage booksStorage, BookPrompter bookPrompter, BookValidator bookValidator, ConsoleIO consoleIO, Translator translator) {
         this.booksStorage = booksStorage;
         this.bookPrompter = bookPrompter;
         this.bookValidator = bookValidator;
         this.consoleIO = consoleIO;
+        this.translator = translator;
     }
 
     @Override
@@ -32,21 +35,21 @@ public class EditBookCommand implements Command {
 
         var existing = booksStorage.findById(id);
         if (existing.isEmpty()) {
-            consoleIO.println("Book not found: id=" + id);
+            consoleIO.println(translator.translate("books.notFound" , id));
             return;
         }
 
         var draft = bookValidator.validateAndNormalize(bookPrompter.promptForEdit(existing.get()));
-        booksStorage.update(id, draft).orElseThrow(() -> new IllegalStateException("Book not found: id=" + id));
-        consoleIO.println("Updated book id=" + id);
+        booksStorage.update(id, draft).orElseThrow(() -> new IllegalStateException(translator.translate("books.notFound", id)));
+        consoleIO.println(translator.translate("books.updated", id));
     }
 
     private long readId() {
-        String raw = consoleIO.readLine("Enter id to edit: ");
+        String raw = consoleIO.readLine(translator.translate("prompt.id.edit"));
         try {
             return Long.parseLong(raw.trim());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid id: " + raw, e);
+            throw new IllegalArgumentException(translator.translate("error.invalidId", raw), e);
         }
     }
 }

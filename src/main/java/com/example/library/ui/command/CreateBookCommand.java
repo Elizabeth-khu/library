@@ -14,7 +14,7 @@ public class CreateBookCommand implements Command {
 
     private static final Logger log = Logger.getLogger(CreateBookCommand.class.getName());
 
-    private final BooksStorage  storage;
+    private final BooksStorage storage;
     private final BookPrompter prompter;
     private final BookValidator validator;
     private final ConsoleIO consoleIO;
@@ -35,6 +35,4 @@ public class CreateBookCommand implements Command {
         var created = storage.create(draft);
         consoleIO.println(translator.translate("books.created", created));
     }
-
-
 }

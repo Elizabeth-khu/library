@@ -14,14 +14,9 @@ public class BookFormatter {
     private static final int LINE_WIDTH = 90;
 
     private static final String ROW_FORMAT = "%-" + ID_WIDTH + "s | %-" + TITLE_WIDTH + "s | %-" + AUTHOR_WIDTH + "s | %s";
-    private static final String EMPTY_LIST_MESSAGE = "No books found";
     private static final String ELLIPSIS = "…";
 
     public String formatList(List<Book> books) {
-        if (books.isEmpty()) {
-            return EMPTY_LIST_MESSAGE;
-        }
-
         StringBuilder sb = new StringBuilder();
         sb.append(header()).append('\n');
         sb.append(line()).append('\n');

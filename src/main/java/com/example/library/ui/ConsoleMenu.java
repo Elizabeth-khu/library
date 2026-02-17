@@ -1,5 +1,6 @@
 package com.example.library.ui;
 
+import com.example.library.i18n.Translator;
 import com.example.library.ui.command.CommandDispatcher;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +13,12 @@ public class ConsoleMenu {
     private static final Logger log = Logger.getLogger(ConsoleMenu.class.getName());
     private final CommandDispatcher dispatcher;
     private final ConsoleIO io;
+    private final Translator translator;
 
-    public ConsoleMenu(ConsoleIO io,CommandDispatcher dispatcher, BookFormatter formatter, BookPrompter prompter) {
+    public ConsoleMenu(ConsoleIO io, CommandDispatcher dispatcher, Translator translator) {
         this.io = io;
         this.dispatcher = dispatcher;
+        this.translator = translator;
     }
 
     public void run() {
@@ -28,7 +31,7 @@ public class ConsoleMenu {
                 }
                 dispatcher.dispatch(action);
             } catch (RuntimeException e) {
-                io.println("Error: " + safeMessage(e));
+                io.println(translator.translate("error.prefix", safeMessage(e)));
                 log.log(Level.WARNING, "Menu action failed", e);
             }
         }
@@ -40,15 +43,17 @@ public class ConsoleMenu {
     }
 
     private MenuAction readAction() {
-        String input = io.readLine("Choose option: ");
-        return MenuAction.from(input).orElseThrow(()-> new IllegalArgumentException("Unknown option"));
+        String input = io.readLine(translator.translate("menu.choose"));
+        return MenuAction.from(input).orElseThrow(()-> new IllegalArgumentException(translator.translate("error.unknownOption")));
     }
 
     private void printMenu() {
         io.println("");
-        io.println("====Library====");
-        for(MenuAction a : MenuAction.values()){
-            io.println(a.code() +") "+ a.label());
-        }
+        io.println(translator.translate("app.title"));
+        io.println(translator.translate("menu.option.display"));
+        io.println(translator.translate("menu.option.create"));
+        io.println(translator.translate("menu.option.edit"));
+        io.println(translator.translate("menu.option.delete"));
+        io.println(translator.translate("menu.option.exit"));
     }
 }

@@ -12,9 +12,7 @@ public class Book {
     private String author;
     private String description;
 
-    public Book() {
-        // for Jackson
-    }
+    public Book() { } // for Jackson
 
     public Book(long id, String title, String author, String description) {
         this.id = id;

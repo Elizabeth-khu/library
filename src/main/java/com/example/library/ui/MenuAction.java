@@ -31,5 +31,4 @@ public enum MenuAction {
                 .filter(action -> action.code.equals(clearInput))
                 .findFirst();
     }
-
 }

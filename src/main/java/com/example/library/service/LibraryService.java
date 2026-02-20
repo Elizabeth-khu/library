@@ -3,10 +3,12 @@ package com.example.library.service;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.storage.BooksStorage;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class LibraryService {
     private final BooksStorage booksStorage;
 

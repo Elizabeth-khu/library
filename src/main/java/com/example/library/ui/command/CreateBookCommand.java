@@ -2,6 +2,7 @@ package com.example.library.ui.command;
 
 import com.example.library.domain.BookValidator;
 import com.example.library.i18n.Translator;
+import com.example.library.service.LibraryService;
 import com.example.library.storage.BooksStorage;
 import com.example.library.ui.BookPrompter;
 import com.example.library.ui.ConsoleIO;
@@ -14,14 +15,14 @@ public class CreateBookCommand implements Command {
 
     private static final Logger log = Logger.getLogger(CreateBookCommand.class.getName());
 
-    private final BooksStorage storage;
+    private final LibraryService libraryService;
     private final BookPrompter prompter;
     private final BookValidator validator;
     private final ConsoleIO consoleIO;
     private final Translator translator;
 
-    public CreateBookCommand(BooksStorage storage, BookPrompter prompter, BookValidator validator, ConsoleIO consoleIO, Translator translator) {
-        this.storage = storage;
+    public CreateBookCommand(LibraryService libraryService, BookPrompter prompter, BookValidator validator, ConsoleIO consoleIO, Translator translator) {
+        this.libraryService = libraryService;
         this.prompter = prompter;
         this.validator = validator;
         this.consoleIO = consoleIO;
@@ -32,7 +33,7 @@ public class CreateBookCommand implements Command {
     public void execute() {
         log.info("Create book");
         var draft = validator.validateAndNormalize(prompter.promptForCreate());
-        var created = storage.create(draft);
+        var created = libraryService.createBook(draft);
         consoleIO.println(translator.translate("books.created", created));
     }
 }

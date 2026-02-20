@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.aop.Cached;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.storage.BooksStorage;
@@ -20,6 +21,7 @@ public class LibraryService {
         return booksStorage.books();
     }
 
+    @Cached
     public Optional<Book> findById(long id){
         return booksStorage.findById(id);
     }

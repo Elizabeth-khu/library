@@ -21,6 +21,11 @@ dependencies {
     // Tests
     testImplementation platform("org.junit:junit-bom:5.10.2")
     testImplementation "org.junit.jupiter:junit-jupiter"
+
+    // AOP-modul
+    implementation "org.springframework:spring-context:6.1.14"
+    implementation "org.springframework:spring-aop:6.1.14"
+    implementation "org.aspectj:aspectjweaver:1.9.22.1"
 }
 
 test {

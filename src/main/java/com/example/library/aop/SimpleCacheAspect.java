@@ -38,7 +38,8 @@ public class SimpleCacheAspect {
     }
 
     private record CacheKey(Method method, Object... args) {
-        CacheKey{
+
+        CacheKey {
             args = Arrays.copyOf(args, args.length);
         }
 
@@ -51,7 +52,7 @@ public class SimpleCacheAspect {
 
         @Override
         public int hashCode() {
-            return 31* method.hashCode() + Arrays.deepHashCode(args);
+            return 31 * method.hashCode() + Arrays.deepHashCode(args);
         }
     }
 

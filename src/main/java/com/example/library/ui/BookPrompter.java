@@ -15,15 +15,15 @@ public class BookPrompter {
         this.io = io;
         this.translator = translator;
     }
-    
-    public BookDraft promptForCreate(){
+
+    public BookDraft promptForCreate() {
         String title = io.readLine(translator.translate("prompt.title"));
-        String author = io.readLine( translator.translate("prompt.author"));
+        String author = io.readLine(translator.translate("prompt.author"));
         String description = io.readLine(translator.translate("prompt.description"));
         return new BookDraft(title, author, description);
     }
-    
-    public BookDraft promptForEdit(Book existing){
+
+    public BookDraft promptForEdit(Book existing) {
         String title = io.readLine(translator.translate("prompt.title.edit", existing.getTitle()));
         String author = io.readLine(translator.translate("prompt.author.edit", existing.getAuthor()));
         String description = io.readLine(translator.translate("prompt.description.edit", existing.getDescription()));

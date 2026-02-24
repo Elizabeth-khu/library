@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class CsvBooksStorage implements BooksStorage{
+public class CsvBooksStorage implements BooksStorage {
 
     private final CsvBooksReader reader;
     private final CsvBooksWriter writer;
@@ -55,15 +55,15 @@ public class CsvBooksStorage implements BooksStorage{
 
     @Override
     public Optional<Book> update(long id, BookDraft bookDraft) {
-       List<Book> currentBooks = reader.readAllBooks();
-       List<Book> updatedBooks = new ArrayList<>(currentBooks);
+        List<Book> currentBooks = reader.readAllBooks();
+        List<Book> updatedBooks = new ArrayList<>(currentBooks);
 
-       if(!replace(updatedBooks, id, bookDraft)) {
-           return Optional.empty();
-       }
+        if (!replace(updatedBooks, id, bookDraft)) {
+            return Optional.empty();
+        }
 
-       writer.writeAllBooks(updatedBooks);
-       return Optional.of(new Book(id, bookDraft.title(), bookDraft.author(), bookDraft.description()));
+        writer.writeAllBooks(updatedBooks);
+        return Optional.of(new Book(id, bookDraft.title(), bookDraft.author(), bookDraft.description()));
 
     }
 
@@ -73,7 +73,7 @@ public class CsvBooksStorage implements BooksStorage{
         List<Book> updatedBooks = new ArrayList<>(currentBooks);
 
         boolean removed = updatedBooks.removeIf(book -> book.getId() == id);
-        if(!removed) return false;
+        if (!removed) return false;
 
         writer.writeAllBooks(updatedBooks);
         return true;
@@ -81,7 +81,7 @@ public class CsvBooksStorage implements BooksStorage{
 
 
     private boolean replace(List<Book> books, long id, BookDraft bookDraft) {
-        for(int i = 0; i < books.size(); ++i) {
+        for (int i = 0; i < books.size(); ++i) {
             if (books.get(i).getId() == id) {
                 books.set(i, new Book(id, bookDraft.title(), bookDraft.author(), bookDraft.description()));
                 return true;

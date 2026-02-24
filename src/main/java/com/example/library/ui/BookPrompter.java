@@ -5,6 +5,8 @@ import com.example.library.domain.BookDraft;
 import com.example.library.i18n.Translator;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class BookPrompter {
 
@@ -35,9 +37,9 @@ public class BookPrompter {
     }
 
     private String emptyAsDefault(String input, String defaultValue) {
-        if (input == null) return defaultValue;
-
-        String t = input.trim();
-        return t.isEmpty() ? defaultValue : t;
+        return Optional.ofNullable(input)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .orElse(defaultValue);
     }
 }

@@ -17,11 +17,11 @@ public enum MenuAction {
         this.label = label;
     }
 
-    public String code(){
+    public String code() {
         return code;
     }
 
-    public String label(){
+    public String label() {
         return label;
     }
 

@@ -44,7 +44,12 @@ public class ConsoleMenu {
 
     private MenuAction readAction() {
         String input = io.readLine(translator.translate("menu.choose"));
-        return MenuAction.from(input).orElseThrow(()-> new IllegalArgumentException(translator.translate("error.unknownOption")));
+        return MenuAction.from(input)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                translator.translate("error.unknownOption")
+                        )
+                );
     }
 
     private void printMenu() {

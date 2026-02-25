@@ -5,23 +5,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookValidator {
 
-    public BookDraft validateAndNormalize(BookDraft bookDraft) {
+    public BookDraft normalize(BookDraft draft) {
         return new BookDraft(
-                requireClean(bookDraft.title(), "title"),
-                requireClean(bookDraft.author(), "author"),
-                requireClean(bookDraft.description(), "description")
+                safeTrim(draft.title()),
+                safeTrim(draft.author()),
+                safeTrim(draft.description())
         );
     }
 
-    private String requireClean(String value, String field) {
-        String cleaned = safeTrim(value);
-        if(cleaned.isEmpty()) {
-            throw new IllegalArgumentException(field + " must not be empty");
-        }
-        return cleaned;
+    public void validate(BookDraft draft) {
+        requireNotBlank(draft.title(), "title");
+        requireNotBlank(draft.author(), "author");
+        requireNotBlank(draft.description(), "description");
     }
 
-    private String safeTrim(String s){
+    public BookDraft validated(BookDraft raw) {
+        BookDraft normalized = normalize(raw);
+        validate(normalized);
+        return normalized;
+    }
+
+    private void requireNotBlank(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(field + " must not be blank");
+        }
+    }
+
+    private String safeTrim(String s) {
         return s == null ? "" : s.trim();
     }
 }

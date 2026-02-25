@@ -39,8 +39,7 @@ public class EditBookCommand implements Command {
             return;
         }
 
-        var draft = bookValidator.validateAndNormalize(bookPrompter.promptForEdit(existing.get()));
-        libraryService.updateBook(id, draft).orElseThrow(() -> new IllegalStateException(translator.translate("books.notFound", id)));
+        var draft = bookValidator.validated(bookPrompter.promptForEdit(existing.get()));        libraryService.updateBook(id, draft).orElseThrow(() -> new IllegalStateException(translator.translate("books.notFound", id)));
         consoleIO.println(translator.translate("books.updated", id));
     }
 

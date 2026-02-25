@@ -31,8 +31,7 @@ public class CreateBookCommand implements Command {
     @Override
     public void execute() {
         log.info("Create book");
-        var draft = validator.validateAndNormalize(prompter.promptForCreate());
-        var created = libraryService.createBook(draft);
+        var draft = validator.validated(prompter.promptForCreate());        var created = libraryService.createBook(draft);
         consoleIO.println(translator.translate("books.created", created));
     }
 }

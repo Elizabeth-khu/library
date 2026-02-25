@@ -55,38 +55,46 @@ public class CsvBooksStorage implements BooksStorage {
 
     @Override
     public Optional<Book> update(long id, BookDraft bookDraft) {
-        List<Book> currentBooks = reader.readAllBooks();
-        List<Book> updatedBooks = new ArrayList<>(currentBooks);
+        var current = reader.readAllBooks();
+        var updated = replaced(current, id, bookDraft);
 
-        if (!replace(updatedBooks, id, bookDraft)) {
+        if (updated.isEmpty()) {
             return Optional.empty();
         }
 
-        writer.writeAllBooks(updatedBooks);
+        writer.writeAllBooks(updated.get());
         return Optional.of(new Book(id, bookDraft.title(), bookDraft.author(), bookDraft.description()));
-
     }
 
     @Override
     public boolean delete(long id) {
-        List<Book> currentBooks = reader.readAllBooks();
-        List<Book> updatedBooks = new ArrayList<>(currentBooks);
+        List<Book> current = reader.readAllBooks();
 
-        boolean removed = updatedBooks.removeIf(book -> book.getId() == id);
-        if (!removed) return false;
+        List<Book> updated = current.stream()
+                .filter(book -> book.getId() != id)
+                .toList();
 
-        writer.writeAllBooks(updatedBooks);
+        if (updated.size() == current.size()) {
+            return false;
+        }
+
+        writer.writeAllBooks(updated);
         return true;
     }
 
+    private Optional<List<Book>> replaced(List<Book> books, long id, BookDraft bookDraft) {
+        var updated = new ArrayList<Book>(books.size());
+        boolean found = false;
 
-    private boolean replace(List<Book> books, long id, BookDraft bookDraft) {
-        for (int i = 0; i < books.size(); ++i) {
-            if (books.get(i).getId() == id) {
-                books.set(i, new Book(id, bookDraft.title(), bookDraft.author(), bookDraft.description()));
-                return true;
+        for (Book b : books) {
+            if (b.getId() == id) {
+                updated.add(new Book(id, bookDraft.title(), bookDraft.author(), bookDraft.description()));
+                found = true;
+            } else {
+                updated.add(b);
             }
         }
-        return false;
+
+        return found ? Optional.of(updated) : Optional.empty();
     }
 }

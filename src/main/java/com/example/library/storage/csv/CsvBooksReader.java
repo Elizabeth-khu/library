@@ -41,7 +41,7 @@ public class CsvBooksReader {
                         .with(HEADER_SCHEMA)
                         .readValues(reader);
 
-                return it.readAll();
+                return List.copyOf(it.readAll());
             }
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read books CSV", e);

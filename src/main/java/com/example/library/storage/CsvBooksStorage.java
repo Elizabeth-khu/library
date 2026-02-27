@@ -23,7 +23,7 @@ public class CsvBooksStorage implements BooksStorage {
 
     @Override
     public List<Book> books() {
-        return List.copyOf(reader.readAllBooks());
+        return reader.readAllBooks();
     }
 
     @Override

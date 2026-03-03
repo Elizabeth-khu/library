@@ -4,13 +4,11 @@ import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.storage.csv.CsvBooksReader;
 import com.example.library.storage.csv.CsvBooksWriter;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 public class CsvBooksStorage implements BooksStorage {
 
     private final CsvBooksReader reader;

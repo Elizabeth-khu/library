@@ -1,10 +1,7 @@
 package com.example.library.domain;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import java.util.Objects;
 
-@JsonPropertyOrder({ "id", "title", "author", "description" })
 public class Book {
 
     private long id;
@@ -12,7 +9,7 @@ public class Book {
     private String author;
     private String description;
 
-    public Book() { } // for Jackson
+    public Book() { }
 
     public Book(long id, String title, String author, String description) {
         this.id = id;

@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring DI (without Spring Boot)
+    implementation 'org.springframework:spring-context:6.2.7'
+
+    // Jackson CSV
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.17.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+
+    // Tests
+    testImplementation platform("org.junit:junit-bom:5.10.2")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+
+    // AOP-modul
+    implementation "org.springframework:spring-context:6.1.14"
+    implementation "org.springframework:spring-aop:6.1.14"
+    implementation "org.aspectj:aspectjweaver:1.9.22.1"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClass = 'com.example.library.Main'
+}
+
+tasks.named('run') {
+    standardInput = System.in
+}
+
+gradle.startParameter.consoleOutput = ConsoleOutput.Plain

@@ -17,11 +17,10 @@ public class DbConfig {
     public DataSource dataSource(Environment env) {
         var ds = new DriverManagerDataSource();
         ds.setDriverClassName("org.postgresql.Driver");
-        ds.setUrl(required(env));
+        ds.setUrl(requiredProperty(env, "db.url"));
         ds.setUsername(env.getProperty("db.username", ""));
         ds.setPassword(env.getProperty("db.password", ""));
         return ds;
-
     }
 
     @Bean
@@ -29,12 +28,11 @@ public class DbConfig {
         return new JdbcTemplate(dataSource);
     }
 
-    private String required(Environment env) {
-        String v = env.getProperty("db.url");
-        if (v == null || v.isBlank()) {
-            throw new IllegalStateException("Missing property: " + "db.url");
+    private String requiredProperty(Environment env, String key) {
+        String value = env.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Missing property: " + key);
         }
-        return v;
+        return value;
     }
-
 }

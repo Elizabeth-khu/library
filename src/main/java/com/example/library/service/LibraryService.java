@@ -8,6 +8,7 @@ import com.example.library.storage.BooksStorage;
 import com.example.library.storage.jdbc.JdbcAuthorsRepository;
 import com.example.library.storage.jdbc.JdbcBookAuthorsRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class LibraryService {
         return booksStorage.findById(id);
     }
 
+    @Transactional
     public Book createBook(BookDraft draft) {
         Author author = authorsRepository.findByName(draft.author())
                 .orElseGet(() -> authorsRepository.create(draft.author()));
@@ -48,6 +50,7 @@ public class LibraryService {
         return created;
     }
 
+    @Transactional
     public Optional<Book> updateBook(long id, BookDraft draft) {
         Optional<Book> updated = booksStorage.update(id, draft);
         if (updated.isEmpty()) {
@@ -66,6 +69,7 @@ public class LibraryService {
         return updated;
     }
 
+    @Transactional
     public boolean deleteBook(long id) {
         return booksStorage.delete(id);
     }

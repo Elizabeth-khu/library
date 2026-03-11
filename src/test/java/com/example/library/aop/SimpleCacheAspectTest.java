@@ -4,9 +4,9 @@ import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.service.LibraryService;
-import com.example.library.storage.AuthorsStorage;
-import com.example.library.storage.BookAuthorsStorage;
 import com.example.library.storage.BooksStorage;
+import com.example.library.storage.jdbc.JdbcAuthorsRepository;
+import com.example.library.storage.jdbc.JdbcBookAuthorsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -68,22 +68,22 @@ class SimpleCacheAspectTest {
         }
 
         @Bean
-        AuthorsStorage authorsStorage() {
-            return new StubAuthorsStorage();
+        JdbcAuthorsRepository authorsRepository() {
+            return new StubAuthorsRepository();
         }
 
         @Bean
-        BookAuthorsStorage bookAuthorsStorage() {
-            return new StubBookAuthorsStorage();
+        JdbcBookAuthorsRepository bookAuthorsRepository() {
+            return new StubBookAuthorsRepository();
         }
 
         @Bean
         LibraryService libraryService(
                 BooksStorage booksStorage,
-                AuthorsStorage authorsStorage,
-                BookAuthorsStorage bookAuthorsStorage
+                JdbcAuthorsRepository authorsRepository,
+                JdbcBookAuthorsRepository bookAuthorsRepository
         ) {
-            return new LibraryService(booksStorage, authorsStorage, bookAuthorsStorage);
+            return new LibraryService(booksStorage, authorsRepository, bookAuthorsRepository);
         }
 
         @Bean
@@ -123,7 +123,11 @@ class SimpleCacheAspectTest {
         }
     }
 
-    static class StubAuthorsStorage implements AuthorsStorage {
+    static class StubAuthorsRepository extends JdbcAuthorsRepository {
+
+        StubAuthorsRepository() {
+            super(null);
+        }
 
         @Override
         public List<Author> authors() {
@@ -156,7 +160,11 @@ class SimpleCacheAspectTest {
         }
     }
 
-    static class StubBookAuthorsStorage implements BookAuthorsStorage {
+    static class StubBookAuthorsRepository extends JdbcBookAuthorsRepository {
+
+        StubBookAuthorsRepository() {
+            super(null);
+        }
 
         @Override
         public void addAuthorToBook(long bookId, long authorId) {

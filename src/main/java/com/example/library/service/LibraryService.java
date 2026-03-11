@@ -4,9 +4,9 @@ import com.example.library.aop.Cached;
 import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
-import com.example.library.storage.AuthorsStorage;
-import com.example.library.storage.BookAuthorsStorage;
 import com.example.library.storage.BooksStorage;
+import com.example.library.storage.jdbc.JdbcAuthorsRepository;
+import com.example.library.storage.jdbc.JdbcBookAuthorsRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,14 +14,19 @@ import java.util.Optional;
 
 @Component
 public class LibraryService {
-    private final BooksStorage booksStorage;
-    private final AuthorsStorage authorsStorage;
-    private final BookAuthorsStorage bookAuthorsStorage;
 
-    public LibraryService(BooksStorage booksStorage, AuthorsStorage authorsStorage, BookAuthorsStorage bookAuthorsStorage) {
+    private final BooksStorage booksStorage;
+    private final JdbcAuthorsRepository authorsRepository;
+    private final JdbcBookAuthorsRepository bookAuthorsRepository;
+
+    public LibraryService(
+            BooksStorage booksStorage,
+            JdbcAuthorsRepository authorsRepository,
+            JdbcBookAuthorsRepository bookAuthorsRepository
+    ) {
         this.booksStorage = booksStorage;
-        this.authorsStorage = authorsStorage;
-        this.bookAuthorsStorage = bookAuthorsStorage;
+        this.authorsRepository = authorsRepository;
+        this.bookAuthorsRepository = bookAuthorsRepository;
     }
 
     public List<Book> listBooks() {
@@ -29,16 +34,16 @@ public class LibraryService {
     }
 
     @Cached
-    public Optional<Book> findById(long id){
+    public Optional<Book> findById(long id) {
         return booksStorage.findById(id);
     }
 
     public Book createBook(BookDraft draft) {
-        Author author = authorsStorage.findByName(draft.author())
-                .orElseGet(() -> authorsStorage.create(draft.author()));
+        Author author = authorsRepository.findByName(draft.author())
+                .orElseGet(() -> authorsRepository.create(draft.author()));
 
         Book created = booksStorage.create(draft);
-        bookAuthorsStorage.addAuthorToBook(created.getId(), author.id());
+        bookAuthorsRepository.addAuthorToBook(created.getId(), author.id());
 
         return created;
     }
@@ -49,16 +54,17 @@ public class LibraryService {
             return Optional.empty();
         }
 
-        Author author = authorsStorage.findByName(draft.author())
-                .orElseGet(() -> authorsStorage.create(draft.author()));
+        Author author = authorsRepository.findByName(draft.author())
+                .orElseGet(() -> authorsRepository.create(draft.author()));
 
-        for (Long authorId : bookAuthorsStorage.authorIdsForBook(id)) {
-            bookAuthorsStorage.removeAuthorFromBook(id, authorId);
+        for (Long authorId : bookAuthorsRepository.authorIdsForBook(id)) {
+            bookAuthorsRepository.removeAuthorFromBook(id, authorId);
         }
 
-        bookAuthorsStorage.addAuthorToBook(id, author.id());
+        bookAuthorsRepository.addAuthorToBook(id, author.id());
 
-        return updated;    }
+        return updated;
+    }
 
     public boolean deleteBook(long id) {
         return booksStorage.delete(id);

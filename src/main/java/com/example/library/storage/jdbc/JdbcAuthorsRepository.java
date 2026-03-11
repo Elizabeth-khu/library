@@ -10,28 +10,32 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class JdbcAuthorsStorage implements AuthorsStorage {
+public class JdbcAuthorsRepository {
 
     private final JdbcTemplate jdbc;
 
-    public JdbcAuthorsStorage(JdbcTemplate jdbc) {
+    public JdbcAuthorsRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
-    @Override
     public List<Author> authors() {
         String sql = "SELECT id, name FROM authors ORDER BY id";
         return jdbc.query(sql, (rs, n) -> new Author(rs.getLong("id"), rs.getString("name")));
     }
 
-    @Override
     public Optional<Author> findById(long id) {
         String sql = "SELECT id, name FROM authors WHERE id = ?";
         List<Author> result = jdbc.query(sql, (rs, n) -> new Author(rs.getLong("id"), rs.getString("name")), id);
         return result.stream().findFirst();
     }
 
-    @Override
+    public Optional<Author> findByName(String name) {
+        String clean = requireName(name);
+        String sql = "SELECT id, name FROM authors WHERE name = ?";
+        List<Author> result = jdbc.query(sql, (rs, n) -> new Author(rs.getLong("id"), rs.getString("name")), clean);
+        return result.stream().findFirst();
+    }
+
     public Author create(String name) {
         String clean = requireName(name);
 
@@ -50,7 +54,6 @@ public class JdbcAuthorsStorage implements AuthorsStorage {
         }
     }
 
-    @Override
     public Optional<Author> update(long id, String name) {
         String clean = requireName(name);
 
@@ -62,21 +65,12 @@ public class JdbcAuthorsStorage implements AuthorsStorage {
         }
     }
 
-    @Override
     public boolean delete(long id) {
         try {
             return jdbc.update("DELETE FROM authors WHERE id = ?", id) > 0;
         } catch (DataIntegrityViolationException e) {
             return false;
         }
-    }
-
-    @Override
-    public Optional<Author> findByName(String name) {
-        String clean = requireName(name);
-        String sql = "SELECT id, name FROM authors WHERE name = ?";
-        List<Author> result = jdbc.query(sql, (rs, n) -> new Author(rs.getLong("id"), rs.getString("name")), clean);
-        return result.stream().findFirst();
     }
 
     private String requireName(String raw) {

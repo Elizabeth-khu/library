@@ -7,15 +7,14 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class JdbcBookAuthorsStorage implements BookAuthorsStorage {
+public class JdbcBookAuthorsRepository {
 
     private final JdbcTemplate jdbc;
 
-    public JdbcBookAuthorsStorage(JdbcTemplate jdbc) {
+    public JdbcBookAuthorsRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
-    @Override
     public void addAuthorToBook(long bookId, long authorId) {
         try {
             jdbc.update(
@@ -26,7 +25,6 @@ public class JdbcBookAuthorsStorage implements BookAuthorsStorage {
         }
     }
 
-    @Override
     public boolean removeAuthorFromBook(long bookId, long authorId) {
         return jdbc.update(
                 "DELETE FROM book_authors WHERE book_id = ? AND author_id = ?",
@@ -34,7 +32,6 @@ public class JdbcBookAuthorsStorage implements BookAuthorsStorage {
         ) > 0;
     }
 
-    @Override
     public List<Long> authorIdsForBook(long bookId) {
         return jdbc.query(
                 "SELECT author_id FROM book_authors WHERE book_id = ? ORDER BY author_id",

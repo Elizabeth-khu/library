@@ -4,12 +4,8 @@ import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.storage.BooksStorage;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +28,7 @@ public class JdbcBooksStorage implements BooksStorage {
                 ORDER BY b.id
                 """;
 
-        return jdbc.query(sql, (rs, rowNum) ->
-                new Book(
-                        rs.getLong("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("description")
-                )
-        );
+        return jdbc.query(sql, this::mapBook);
     }
 
     @Override
@@ -52,15 +41,7 @@ public class JdbcBooksStorage implements BooksStorage {
                 WHERE b.id = ?
                 """;
 
-        List<Book> result = jdbc.query(sql, (rs, rowNum) ->
-                new Book(
-                        rs.getLong("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("description")
-                ), id
-        );
-
+        List<Book> result = jdbc.query(sql, this::mapBook, id);
         return result.stream().findFirst();
     }
 
@@ -74,14 +55,18 @@ public class JdbcBooksStorage implements BooksStorage {
     public Optional<Book> update(long id, BookDraft draft) {
         int updated = jdbc.update(
                 "UPDATE books SET title = ?, description = ? WHERE id = ?",
-                draft.title(), draft.description(), id
+                draft.title(),
+                draft.description(),
+                id
         );
 
         if (updated == 0) {
             return Optional.empty();
         }
 
-        return Optional.of(new Book(id, draft.title(), draft.author(), draft.description()));
+        return Optional.of(
+                new Book(id, draft.title(), draft.author(), draft.description())
+        );
     }
 
     @Override
@@ -89,14 +74,24 @@ public class JdbcBooksStorage implements BooksStorage {
         return jdbc.update("DELETE FROM books WHERE id = ?", id) > 0;
     }
 
-
     private long insertBook(String title, String description) {
         String sql = "INSERT INTO books(title, description) VALUES (?, ?) RETURNING id";
+
         Long id = jdbc.queryForObject(sql, Long.class, title, description);
 
         if (id == null) {
             throw new IllegalStateException("Failed to get generated book id");
         }
+
         return id;
+    }
+
+    private Book mapBook(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
+        return new Book(
+                rs.getLong("id"),
+                rs.getString("title"),
+                rs.getString("author"),
+                rs.getString("description")
+        );
     }
 }

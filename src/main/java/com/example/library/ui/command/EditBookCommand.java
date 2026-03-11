@@ -1,5 +1,7 @@
 package com.example.library.ui.command;
 
+import com.example.library.domain.Book;
+import com.example.library.domain.BookDraft;
 import com.example.library.domain.BookValidator;
 import com.example.library.i18n.Translator;
 import com.example.library.service.LibraryService;
@@ -7,6 +9,7 @@ import com.example.library.ui.BookPrompter;
 import com.example.library.ui.ConsoleIO;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Component
@@ -33,13 +36,13 @@ public class EditBookCommand implements Command {
         log.info("Edit book");
         long id = readId();
 
-        var existing = libraryService.findById(id);
+        Optional<Book> existing = libraryService.findById(id);
         if (existing.isEmpty()) {
             consoleIO.println(translator.translate("books.notFound" , id));
             return;
         }
 
-        var draft = bookValidator.validated(bookPrompter.promptForEdit(existing.get()));        libraryService.updateBook(id, draft).orElseThrow(() -> new IllegalStateException(translator.translate("books.notFound", id)));
+        BookDraft draft = bookValidator.validated(bookPrompter.promptForEdit(existing.get()));        libraryService.updateBook(id, draft).orElseThrow(() -> new IllegalStateException(translator.translate("books.notFound", id)));
         consoleIO.println(translator.translate("books.updated", id));
     }
 

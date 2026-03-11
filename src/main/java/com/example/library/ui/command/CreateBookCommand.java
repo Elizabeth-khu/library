@@ -1,5 +1,7 @@
 package com.example.library.ui.command;
 
+import com.example.library.domain.Book;
+import com.example.library.domain.BookDraft;
 import com.example.library.domain.BookValidator;
 import com.example.library.i18n.Translator;
 import com.example.library.service.LibraryService;
@@ -31,7 +33,8 @@ public class CreateBookCommand implements Command {
     @Override
     public void execute() {
         log.info("Create book");
-        var draft = validator.validated(prompter.promptForCreate());        var created = libraryService.createBook(draft);
+        BookDraft draft = validator.validated(prompter.promptForCreate());
+        Book created = libraryService.createBook(draft);
         consoleIO.println(translator.translate("books.created", created));
     }
 }

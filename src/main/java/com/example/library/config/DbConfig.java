@@ -17,7 +17,7 @@ public class DbConfig {
 
     @Bean
     public DataSource dataSource(Environment env) {
-        var ds = new DriverManagerDataSource();
+        DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("org.postgresql.Driver");
         ds.setUrl(requiredProperty(env, "db.url"));
         ds.setUsername(env.getProperty("db.username", ""));

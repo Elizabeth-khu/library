@@ -72,9 +72,11 @@ public class JdbcAuthorsStorage implements AuthorsStorage {
         }
     }
 
-    private Optional<Author> findByName(String name) {
+    @Override
+    public Optional<Author> findByName(String name) {
+        String clean = requireName(name);
         String sql = "SELECT id, name FROM authors WHERE name = ?";
-        List<Author> result = jdbc.query(sql, (rs, n) -> new Author(rs.getLong("id"), rs.getString("name")), name);
+        List<Author> result = jdbc.query(sql, (rs, n) -> new Author(rs.getLong("id"), rs.getString("name")), clean);
         return result.stream().findFirst();
     }
 

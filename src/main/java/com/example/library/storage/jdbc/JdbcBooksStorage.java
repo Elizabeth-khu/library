@@ -66,9 +66,7 @@ public class JdbcBooksStorage implements BooksStorage {
 
     @Override
     public Book create(BookDraft draft) {
-        long authorId = ensureAuthorId(draft.author());
         long bookId = insertBook(draft.title(), draft.description());
-        linkBookAuthor(bookId, authorId);
         return new Book(bookId, draft.title(), draft.author(), draft.description());
     }
 
@@ -78,13 +76,10 @@ public class JdbcBooksStorage implements BooksStorage {
                 "UPDATE books SET title = ?, description = ? WHERE id = ?",
                 draft.title(), draft.description(), id
         );
+
         if (updated == 0) {
             return Optional.empty();
         }
-
-        long authorId = ensureAuthorId(draft.author());
-        jdbc.update("DELETE FROM book_authors WHERE book_id = ?", id);
-        linkBookAuthor(id, authorId);
 
         return Optional.of(new Book(id, draft.title(), draft.author(), draft.description()));
     }
@@ -94,10 +89,6 @@ public class JdbcBooksStorage implements BooksStorage {
         return jdbc.update("DELETE FROM books WHERE id = ?", id) > 0;
     }
 
-    private long ensureAuthorId(String name) {
-        jdbc.update("INSERT INTO authors(name) VALUES (?) ON CONFLICT (name) DO NOTHING", name);
-        return jdbc.queryForObject("SELECT id FROM authors WHERE name = ?", Long.class, name);
-    }
 
     private long insertBook(String title, String description) {
         String sql = "INSERT INTO books(title, description) VALUES (?, ?) RETURNING id";
@@ -107,12 +98,5 @@ public class JdbcBooksStorage implements BooksStorage {
             throw new IllegalStateException("Failed to get generated book id");
         }
         return id;
-    }
-
-    private void linkBookAuthor(long bookId, long authorId) {
-        jdbc.update(
-                "INSERT INTO book_authors(book_id, author_id) VALUES (?, ?)",
-                bookId, authorId
-        );
     }
 }

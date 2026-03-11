@@ -3,9 +3,11 @@ package com.example.library.storage.jdbc;
 import com.example.library.storage.BookAuthorsStorage;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class JdbcBookAuthorsStorage implements BookAuthorsStorage {
 
     private final JdbcTemplate jdbc;

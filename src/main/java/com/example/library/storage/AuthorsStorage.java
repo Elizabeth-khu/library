@@ -10,6 +10,8 @@ public interface AuthorsStorage {
 
     Optional<Author> findById(long id);
 
+    Optional<Author> findByName(String name);
+
     Author create(String name);
 
     Optional<Author> update(long id, String name);

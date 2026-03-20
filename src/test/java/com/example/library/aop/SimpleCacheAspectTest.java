@@ -14,7 +14,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,8 +37,8 @@ class SimpleCacheAspectTest {
         LibraryService service = ctx.getBean(LibraryService.class);
         StubBooksRepository booksRepository = ctx.getBean(StubBooksRepository.class);
 
-        assertTrue(service.findById(1).isPresent());
-        assertTrue(service.findById(1).isPresent());
+        assertTrue(service.findById(1L).isPresent());
+        assertTrue(service.findById(1L).isPresent());
 
         assertEquals(1, booksRepository.findByIdCalls.get());
     }
@@ -51,8 +50,8 @@ class SimpleCacheAspectTest {
         LibraryService service = ctx.getBean(LibraryService.class);
         StubBooksRepository booksRepository = ctx.getBean(StubBooksRepository.class);
 
-        service.findById(1);
-        service.findById(2);
+        service.findById(1L);
+        service.findById(2L);
 
         assertEquals(2, booksRepository.findByIdCalls.get());
     }
@@ -95,17 +94,13 @@ class SimpleCacheAspectTest {
 
         @Override
         public List<Book> findAll() {
-            return List.of(new Book(1, "T", "A", "D"));
+            return List.of(new Book(1L, "T", "D"));
         }
 
         @Override
         public Optional<Book> findById(long id) {
             findByIdCalls.incrementAndGet();
-
-            Book book = new Book(id, "T" + id, "A", "D");
-            book.setAuthors(Set.of(new Author(1L, "A")));
-
-            return Optional.of(book);
+            return Optional.of(new Book(id, "Title", "Desc"));
         }
 
         @Override
@@ -135,22 +130,8 @@ class SimpleCacheAspectTest {
         }
 
         @Override
-        public Optional<Author> findByName(String name) {
-            return Optional.empty();
-        }
-
-        @Override
         public Author save(Author author) {
             return author;
-        }
-
-        @Override
-        public void delete(Author author) {
-        }
-
-        @Override
-        public Author getOrCreate(String name) {
-            return new Author(1L, name);
         }
     }
 }

@@ -81,6 +81,11 @@ class StartupLocaleSelectorTest {
             return inputs.isEmpty() ? "" : inputs.removeFirst();
         }
 
+        @Override
+        public void print(String message) {
+            System.out.println(message);
+        }
+
         String printed() {
             return out.toString();
         }

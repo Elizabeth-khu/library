@@ -48,7 +48,10 @@ public class DbConfig {
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("hibernate.format_sql", "true");
-        properties.setProperty("hibernate.current_session_context_class", "org.springframework.orm.hibernate5.SpringSessionContext");
+        properties.setProperty(
+                "hibernate.current_session_context_class",
+                "org.springframework.orm.hibernate5.SpringSessionContext"
+        );
         return properties;
     }
 

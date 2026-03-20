@@ -4,73 +4,70 @@ import com.example.library.aop.Cached;
 import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
-import com.example.library.storage.BooksStorage;
-import com.example.library.storage.jdbc.JdbcAuthorsRepository;
-import com.example.library.storage.jdbc.JdbcBookAuthorsRepository;
-import org.springframework.stereotype.Component;
+import com.example.library.storage.hibernate.HibernateAuthorsRepository;
+import com.example.library.storage.hibernate.HibernateBooksRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-@Component
+@Service
 public class LibraryService {
 
-    private final BooksStorage booksStorage;
-    private final JdbcAuthorsRepository authorsRepository;
-    private final JdbcBookAuthorsRepository bookAuthorsRepository;
+    private final HibernateBooksRepository booksRepository;
+    private final HibernateAuthorsRepository authorsRepository;
 
     public LibraryService(
-            BooksStorage booksStorage,
-            JdbcAuthorsRepository authorsRepository,
-            JdbcBookAuthorsRepository bookAuthorsRepository
+            HibernateBooksRepository booksRepository,
+            HibernateAuthorsRepository authorsRepository
     ) {
-        this.booksStorage = booksStorage;
+        this.booksRepository = booksRepository;
         this.authorsRepository = authorsRepository;
-        this.bookAuthorsRepository = bookAuthorsRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<Book> listBooks() {
-        return booksStorage.books();
+        return booksRepository.findAll();
     }
 
     @Cached
+    @Transactional(readOnly = true)
     public Optional<Book> findById(long id) {
-        return booksStorage.findById(id);
+        return booksRepository.findById(id);
     }
 
     @Transactional
     public Book createBook(BookDraft draft) {
-        Author author = authorsRepository.findByName(draft.author())
-                .orElseGet(() -> authorsRepository.create(draft.author()));
+        Author author = authorsRepository.findById(draft.authorId())
+                .orElseThrow(() -> new IllegalArgumentException("Author not found with ID: " + draft.authorId()));
 
-        Book created = booksStorage.create(draft);
-        bookAuthorsRepository.addAuthorToBook(created.getId(), author.id());
+        Book book = new Book(draft.title(), draft.description());
+        book.setAuthors(Set.of(author));
 
-        return created;
+        return booksRepository.save(book);
     }
 
     @Transactional
     public Optional<Book> updateBook(long id, BookDraft draft) {
-        Optional<Book> updated = booksStorage.update(id, draft);
-        if (updated.isEmpty()) {
-            return Optional.empty();
-        }
+        return booksRepository.findById(id).map(book -> {
+            Author author = authorsRepository.findById(draft.authorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Author not found with ID: " + draft.authorId()));
 
-        Author author = authorsRepository.findByName(draft.author())
-                .orElseGet(() -> authorsRepository.create(draft.author()));
+            book.setTitle(draft.title());
+            book.setDescription(draft.description());
+            book.setAuthors(Set.of(author));
 
-        for (Long authorId : bookAuthorsRepository.authorIdsForBook(id)) {
-            bookAuthorsRepository.removeAuthorFromBook(id, authorId);
-        }
-
-        bookAuthorsRepository.addAuthorToBook(id, author.id());
-
-        return updated;
+            return booksRepository.save(book);
+        });
     }
 
     @Transactional
     public boolean deleteBook(long id) {
-        return booksStorage.delete(id);
+        return booksRepository.findById(id).map(book -> {
+            booksRepository.delete(book);
+            return true;
+        }).orElse(false);
     }
 }

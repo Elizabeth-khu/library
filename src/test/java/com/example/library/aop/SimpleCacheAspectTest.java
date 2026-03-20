@@ -128,10 +128,5 @@ class SimpleCacheAspectTest {
         public Optional<Author> findById(long id) {
             return Optional.empty();
         }
-
-        @Override
-        public Author save(Author author) {
-            return author;
-        }
     }
 }

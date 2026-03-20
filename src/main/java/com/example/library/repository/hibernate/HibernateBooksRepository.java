@@ -1,4 +1,4 @@
-package com.example.library.storage.hibernate;
+package com.example.library.repository.hibernate;
 
 import com.example.library.domain.Book;
 import jakarta.persistence.criteria.CriteriaBuilder;

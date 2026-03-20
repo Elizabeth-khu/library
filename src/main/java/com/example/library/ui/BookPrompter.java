@@ -4,7 +4,7 @@ import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.i18n.Translator;
-import com.example.library.storage.hibernate.HibernateAuthorsRepository; // Добавляем репозиторий
+import com.example.library.repository.hibernate.HibernateAuthorsRepository; // Добавляем репозиторий
 import org.springframework.stereotype.Component;
 
 import java.util.List;

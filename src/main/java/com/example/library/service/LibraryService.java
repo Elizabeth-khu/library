@@ -4,8 +4,8 @@ import com.example.library.aop.Cached;
 import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
-import com.example.library.storage.hibernate.HibernateAuthorsRepository;
-import com.example.library.storage.hibernate.HibernateBooksRepository;
+import com.example.library.repository.hibernate.HibernateAuthorsRepository;
+import com.example.library.repository.hibernate.HibernateBooksRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

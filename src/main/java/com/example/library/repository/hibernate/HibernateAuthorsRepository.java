@@ -1,4 +1,4 @@
-package com.example.library.storage.hibernate;
+package com.example.library.repository.hibernate;
 
 import com.example.library.domain.Author;
 import org.hibernate.Session;
@@ -19,7 +19,7 @@ public class HibernateAuthorsRepository {
 
     public List<Author> findAll() {
         return currentSession()
-                .createQuery("from Author", Author.class)
+                .createQuery("select distinct a from Author a", Author.class)
                 .getResultList();
     }
 
@@ -27,9 +27,9 @@ public class HibernateAuthorsRepository {
         return Optional.ofNullable(currentSession().get(Author.class, id));
     }
 
-    public Author save(Author author) {
-        currentSession().saveOrUpdate(author);
-        return author;
+
+    public void delete(Author author) {
+        currentSession().remove(author);
     }
 
     private Session currentSession() {

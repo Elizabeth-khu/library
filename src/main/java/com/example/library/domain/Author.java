@@ -1,6 +1,6 @@
 package com.example.library.domain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -51,11 +51,13 @@ public class Author {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Author author)) return false;
-        return id == author.id;
+        if (id != 0 && author.id != 0) return id == author.id;
+        return Objects.equals(name, author.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        if (id != 0) return Objects.hash(id);
+        return Objects.hash(name);
     }
 }

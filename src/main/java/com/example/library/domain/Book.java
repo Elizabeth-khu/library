@@ -1,9 +1,11 @@
 package com.example.library.domain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "books")
@@ -19,9 +21,6 @@ public class Book {
     @Column(name = "description")
     private String description;
 
-    @Transient
-    private String author;
-
     @ManyToMany
     @JoinTable(
             name = "book_authors",
@@ -33,14 +32,13 @@ public class Book {
     public Book() {
     }
 
-    public Book(long id, String title, String author, String description) {
-        this.id = id;
+    public Book(String title, String description) {
         this.title = title;
-        this.author = author;
         this.description = description;
     }
 
-    public Book(String title, String description) {
+    public Book(long id, String title, String description) {
+        this.id = id;
         this.title = title;
         this.description = description;
     }
@@ -53,49 +51,55 @@ public class Book {
         return title;
     }
 
-    public String getAuthor() {
-        if (author != null) {
-            return author;
-        }
-        return authors.stream()
-                .map(Author::getName)
-                .findFirst()
-                .orElse("");
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Set<Author> getAuthors() {
-        return authors;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public Set<Author> getAuthors() {
+        return authors;
     }
 
     public void setAuthors(Set<Author> authors) {
         this.authors = authors;
     }
 
+    public void addAuthor(Author author) {
+        this.authors.add(author);
+        author.getBooks().add(this);
+    }
+
+    public String getAuthorsAsString() {
+        if (authors == null || authors.isEmpty()) {
+            return "Unknown Author";
+        }
+        return authors.stream()
+                .map(Author::getName)
+                .collect(Collectors.joining(", "));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Book book)) return false;
-        return id == book.id;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+
+        if (id != 0 && book.id != 0) return id == book.id;
+
+        return Objects.equals(title, book.title) &&
+                Objects.equals(description, book.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        if (id != 0) return Objects.hash(id);
+        return Objects.hash(title, description);
     }
 }

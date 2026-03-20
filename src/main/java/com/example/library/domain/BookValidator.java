@@ -8,14 +8,16 @@ public class BookValidator {
     public BookDraft normalize(BookDraft draft) {
         return new BookDraft(
                 safeTrim(draft.title()),
-                safeTrim(draft.author()),
+                draft.authorId(),
                 safeTrim(draft.description())
         );
     }
 
     public void validate(BookDraft draft) {
         requireNotBlank(draft.title(), "title");
-        requireNotBlank(draft.author(), "author");
+        if (draft.authorId() <= 0) {
+            throw new IllegalArgumentException("authorId must be greater than 0");
+        }
         requireNotBlank(draft.description(), "description");
     }
 

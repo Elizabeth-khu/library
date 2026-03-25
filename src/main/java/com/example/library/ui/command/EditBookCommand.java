@@ -1,6 +1,5 @@
 package com.example.library.ui.command;
 
-import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.domain.BookValidator;
@@ -35,37 +34,35 @@ public class EditBookCommand implements Command {
     @Override
     public void execute() {
         log.info("Edit book start");
-        long id = readId();
+        long bookId = readId();
 
-        Optional<Book> bookOpt = libraryService.findById(id);
-        if (bookOpt.isEmpty()) {
-            consoleIO.println(translator.translate("books.notFound", id));
+        Optional<Book> existingOpt = libraryService.findById(bookId);
+        if (existingOpt.isEmpty()) {
+            consoleIO.println(translator.translate("books.notFound", bookId));
             return;
         }
 
-        Book book = bookOpt.get();
+        BookDraft draft = bookValidator.validated(bookPrompter.promptForEdit(existingOpt.get()));
 
-        BookDraft draft = bookValidator.validated(bookPrompter.promptForEdit(book));
+        Optional<Long> authorIdOpt = Optional.empty();
+        while (authorIdOpt.isEmpty()) {
+            authorIdOpt = bookPrompter.promptForAuthorId();
+        }
 
-        Author author = bookPrompter.promptForAuthor();
-
-        book.setTitle(draft.title());
-        book.setDescription(draft.description());
-
-        book.getAuthors().clear();
-        book.addAuthor(author);
-
-        libraryService.save(book);
-
-        consoleIO.println(translator.translate("books.updated", id));
+        try {
+            libraryService.updateBook(bookId, draft, authorIdOpt.get());
+            consoleIO.println(translator.translate("books.updated", bookId));
+        } catch (IllegalArgumentException e) {
+            consoleIO.println(e.getMessage());
+        }
     }
 
     private long readId() {
         String raw = consoleIO.readLine(translator.translate("prompt.id.edit"));
         try {
             return Long.parseLong(raw.trim());
-        } catch (Exception e) {
-            consoleIO.println(translator.translate("error.invalidId", raw));
+        } catch (NumberFormatException e) {
+            consoleIO.println(translator.translate("error.invalidIdFormat"));
             return -1;
         }
     }

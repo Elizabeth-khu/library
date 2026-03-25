@@ -3,6 +3,7 @@ package com.example.library.service;
 import com.example.library.aop.Cached;
 import com.example.library.domain.Author;
 import com.example.library.domain.Book;
+import com.example.library.domain.BookDraft;
 import com.example.library.repository.AuthorRepository;
 import com.example.library.repository.hibernate.HibernateBooksRepository;
 import org.springframework.stereotype.Service;
@@ -41,16 +42,42 @@ public class LibraryService {
         return authorsRepository.findById(id);
     }
 
-    @Transactional
     public Book save(Book book) {
         return booksRepository.save(book);
     }
 
-    @Transactional
     public boolean deleteBook(long id) {
         return booksRepository.findById(id).map(book -> {
             booksRepository.delete(book);
             return true;
         }).orElse(false);
+    }
+
+    public Book createBook(BookDraft draft, Long authorId) {
+        Author author = authorsRepository.findById(authorId)
+                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+
+        Book book = new Book();
+        book.setTitle(draft.title());
+        book.setDescription(draft.description());
+        book.addAuthor(author);
+
+        return booksRepository.save(book);
+    }
+
+    public Book updateBook(long bookId, BookDraft draft, Long authorId) {
+        Book book = booksRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+
+        Author author = authorsRepository.findById(authorId)
+                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+
+        book.setTitle(draft.title());
+        book.setDescription(draft.description());
+
+        book.getAuthors().clear();
+        book.addAuthor(author);
+
+        return booksRepository.save(book);
     }
 }

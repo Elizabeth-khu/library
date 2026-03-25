@@ -27,23 +27,13 @@ public class BookPrompter {
         return new BookDraft(title, "", description);
     }
 
-    public Author promptForAuthor() {
-        while (true) {
-            String input = io.readLine(translator.translate("prompt.author.id"));
-            try {
-                Long id = Long.parseLong(input.trim());
-
-                return libraryService.findAuthorById(id)
-                        .orElseGet(() -> {
-                            io.println(translator.translate("error.authorNotFound", id));
-                            return null;
-                        });
-
-            } catch (NumberFormatException e) {
-                io.println(translator.translate("error.invalidIdFormat"));
-            } catch (Exception e) {
-                io.println(e.getMessage());
-            }
+    public Optional<Long> promptForAuthorId() {
+        String input = io.readLine(translator.translate("prompt.author.id"));
+        try {
+            return Optional.of(Long.parseLong(input.trim()));
+        } catch (NumberFormatException e) {
+            io.println(translator.translate("error.invalidIdFormat"));
+            return Optional.empty();
         }
     }
 

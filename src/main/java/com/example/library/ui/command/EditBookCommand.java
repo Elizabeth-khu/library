@@ -1,5 +1,6 @@
 package com.example.library.ui.command;
 
+import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.domain.BookValidator;
@@ -33,16 +34,29 @@ public class EditBookCommand implements Command {
 
     @Override
     public void execute() {
-        log.info("Edit book");
+        log.info("Edit book start");
         long id = readId();
 
-        Optional<Book> existing = libraryService.findById(id);
-        if (existing.isEmpty()) {
-            consoleIO.println(translator.translate("books.notFound" , id));
+        Optional<Book> bookOpt = libraryService.findById(id);
+        if (bookOpt.isEmpty()) {
+            consoleIO.println(translator.translate("books.notFound", id));
             return;
         }
 
-        BookDraft draft = bookValidator.validated(bookPrompter.promptForEdit(existing.get()));        libraryService.updateBook(id, draft).orElseThrow(() -> new IllegalStateException(translator.translate("books.notFound", id)));
+        Book book = bookOpt.get();
+
+        BookDraft draft = bookValidator.validated(bookPrompter.promptForEdit(book));
+
+        Author author = bookPrompter.promptForAuthor();
+
+        book.setTitle(draft.title());
+        book.setDescription(draft.description());
+
+        book.getAuthors().clear();
+        book.addAuthor(author);
+
+        libraryService.save(book);
+
         consoleIO.println(translator.translate("books.updated", id));
     }
 
@@ -51,7 +65,8 @@ public class EditBookCommand implements Command {
         try {
             return Long.parseLong(raw.trim());
         } catch (Exception e) {
-            throw new IllegalArgumentException(translator.translate("error.invalidId", raw), e);
+            consoleIO.println(translator.translate("error.invalidId", raw));
+            return -1;
         }
     }
 }

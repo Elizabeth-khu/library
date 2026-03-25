@@ -13,15 +13,13 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
     private String description;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "book_authors",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -73,7 +71,6 @@ public class Book {
 
     public void addAuthor(Author author) {
         this.authors.add(author);
-        author.getBooks().add(this);
     }
 
     public String getAuthorsAsString() {

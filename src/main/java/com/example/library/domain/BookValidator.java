@@ -8,17 +8,28 @@ public class BookValidator {
     public BookDraft normalize(BookDraft draft) {
         return new BookDraft(
                 safeTrim(draft.title()),
-                draft.authorId(),
+                safeTrim(draft.authorId()),
                 safeTrim(draft.description())
         );
     }
 
     public void validate(BookDraft draft) {
         requireNotBlank(draft.title(), "title");
-        if (draft.authorId() <= 0) {
-            throw new IllegalArgumentException("authorId must be greater than 0");
-        }
+        requireNotBlank(draft.authorId(), "authorId");
+        validateAuthorIdFormat(draft.authorId());
+
         requireNotBlank(draft.description(), "description");
+    }
+
+    private void validateAuthorIdFormat(String authorId) {
+        try {
+            long id = Long.parseLong(authorId);
+            if (id <= 0) {
+                throw new IllegalArgumentException("authorId must be greater than 0");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("authorId must be a valid number", e);
+        }
     }
 
     public BookDraft validated(BookDraft raw) {

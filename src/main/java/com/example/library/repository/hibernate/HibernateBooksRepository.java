@@ -39,20 +39,18 @@ public class HibernateBooksRepository {
                 .distinct(true)
                 .where(cb.equal(root.get("id"), id));
 
-        List<Book> result = currentSession()
+        return currentSession()
                 .createQuery(cq)
-                .getResultList();
-
-        return result.stream().findFirst();
+                .uniqueResultOptional();
     }
 
     public Book save(Book book) {
-        currentSession().saveOrUpdate(book);
-        return book;
+        return currentSession().merge(book);
     }
 
     public void delete(Book book) {
-        currentSession().delete(book);
+        Session session = currentSession();
+        session.remove(session.contains(book) ? book : session.merge(book));
     }
 
     private Session currentSession() {

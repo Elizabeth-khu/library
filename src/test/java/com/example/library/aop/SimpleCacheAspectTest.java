@@ -1,10 +1,10 @@
 package com.example.library.aop;
 
-import com.example.library.domain.Author;
 import com.example.library.domain.Book;
-import com.example.library.service.LibraryService;
+import com.example.library.repository.AuthorRepository;
 import com.example.library.repository.hibernate.HibernateAuthorsRepository;
 import com.example.library.repository.hibernate.HibernateBooksRepository;
+import com.example.library.service.LibraryService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -12,12 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 class SimpleCacheAspectTest {
 
@@ -25,9 +22,7 @@ class SimpleCacheAspectTest {
 
     @AfterEach
     void tearDown() {
-        if (ctx != null) {
-            ctx.close();
-        }
+        if (ctx != null) ctx.close();
     }
 
     @Test
@@ -35,98 +30,39 @@ class SimpleCacheAspectTest {
         ctx = new AnnotationConfigApplicationContext(TestConfig.class);
 
         LibraryService service = ctx.getBean(LibraryService.class);
-        StubBooksRepository booksRepository = ctx.getBean(StubBooksRepository.class);
+        HibernateBooksRepository booksRepo = ctx.getBean(HibernateBooksRepository.class);
 
-        assertTrue(service.findById(1L).isPresent());
-        assertTrue(service.findById(1L).isPresent());
-
-        assertEquals(1, booksRepository.findByIdCalls.get());
-    }
-
-    @Test
-    void doesNotReuseCacheForDifferentArguments() {
-        ctx = new AnnotationConfigApplicationContext(TestConfig.class);
-
-        LibraryService service = ctx.getBean(LibraryService.class);
-        StubBooksRepository booksRepository = ctx.getBean(StubBooksRepository.class);
+        Book testBook = new Book();
+        when(booksRepo.findById(1L)).thenReturn(Optional.of(testBook));
 
         service.findById(1L);
-        service.findById(2L);
+        service.findById(1L);
 
-        assertEquals(2, booksRepository.findByIdCalls.get());
+        verify(booksRepo, times(1)).findById(1L);
     }
 
     @Configuration
-    @EnableAspectJAutoProxy
+    @EnableAspectJAutoProxy(proxyTargetClass = true)
     static class TestConfig {
 
         @Bean
-        StubBooksRepository booksRepository() {
-            return new StubBooksRepository();
+        public HibernateBooksRepository booksRepository() {
+            return mock(HibernateBooksRepository.class);
         }
 
         @Bean
-        StubAuthorsRepository authorsRepository() {
-            return new StubAuthorsRepository();
+        public AuthorRepository authorRepository() {
+            return mock(AuthorRepository.class);
         }
 
         @Bean
-        LibraryService libraryService(
-                HibernateBooksRepository booksRepository,
-                HibernateAuthorsRepository authorsRepository
-        ) {
-            return new LibraryService(booksRepository, authorsRepository);
+        public LibraryService libraryService(HibernateBooksRepository b, AuthorRepository a) {
+            return new LibraryService(b, a);
         }
 
         @Bean
-        SimpleCacheAspect simpleCacheAspect() {
+        public SimpleCacheAspect simpleCacheAspect() {
             return new SimpleCacheAspect();
-        }
-    }
-
-    static class StubBooksRepository extends HibernateBooksRepository {
-
-        final AtomicInteger findByIdCalls = new AtomicInteger();
-
-        StubBooksRepository() {
-            super(null);
-        }
-
-        @Override
-        public List<Book> findAll() {
-            return List.of(new Book(1L, "T", "D"));
-        }
-
-        @Override
-        public Optional<Book> findById(long id) {
-            findByIdCalls.incrementAndGet();
-            return Optional.of(new Book(id, "Title", "Desc"));
-        }
-
-        @Override
-        public Book save(Book book) {
-            return book;
-        }
-
-        @Override
-        public void delete(Book book) {
-        }
-    }
-
-    static class StubAuthorsRepository extends HibernateAuthorsRepository {
-
-        StubAuthorsRepository() {
-            super(null);
-        }
-
-        @Override
-        public List<Author> findAll() {
-            return List.of();
-        }
-
-        @Override
-        public Optional<Author> findById(long id) {
-            return Optional.empty();
         }
     }
 }

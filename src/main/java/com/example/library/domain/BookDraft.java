@@ -1,3 +1,3 @@
 package com.example.library.domain;
 
-public record BookDraft(String title, long authorId, String description) {}
+public record BookDraft(String title, String authorId, String description) {}

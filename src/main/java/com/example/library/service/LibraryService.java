@@ -5,7 +5,7 @@ import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.repository.AuthorRepository;
-import com.example.library.repository.hibernate.HibernateBooksRepository;
+import com.example.library.repository.BookRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +15,12 @@ import java.util.Optional;
 @Service
 @Transactional
 public class LibraryService {
-    private final HibernateBooksRepository booksRepository;
+
+    private final BookRepository booksRepository;
     private final AuthorRepository authorsRepository;
 
     public LibraryService(
-            HibernateBooksRepository booksRepository,
+            BookRepository booksRepository,
             AuthorRepository authorsRepository
     ) {
         this.booksRepository = booksRepository;
@@ -79,5 +80,9 @@ public class LibraryService {
         book.addAuthor(author);
 
         return booksRepository.save(book);
+    }
+
+    public Author saveAuthor(Author author) {
+        return authorsRepository.save(author);
     }
 }

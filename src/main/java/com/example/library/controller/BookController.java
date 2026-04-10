@@ -1,10 +1,9 @@
 package com.example.library.controller;
 
 import com.example.library.domain.Book;
+import com.example.library.domain.BookDraft;
 import com.example.library.service.LibraryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +20,18 @@ public class BookController {
     @GetMapping
     public List<Book> getAllBooks() {
         return libraryService.listBooks();
+    }
+
+    @PostMapping
+    public Book createBook(@RequestBody Book book) {
+        return libraryService.save(book);
+    }
+
+    @PostMapping("/author/{authorId}")
+    public Book createBookWithAuthor(
+            @RequestBody BookDraft draft,
+            @PathVariable Long authorId
+    ) {
+        return libraryService.createBook(draft, authorId);
     }
 }

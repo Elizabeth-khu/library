@@ -87,16 +87,11 @@ public class Book {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-
-        if (id != 0 && book.id != 0) return id == book.id;
-
-        return Objects.equals(title, book.title) &&
-                Objects.equals(description, book.description);
+        return Objects.equals(id, book.id);
     }
 
     @Override
     public int hashCode() {
-        if (id != 0) return Objects.hash(id);
-        return Objects.hash(title, description);
+        return Objects.hash(id);
     }
 }

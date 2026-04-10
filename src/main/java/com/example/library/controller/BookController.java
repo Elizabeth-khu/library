@@ -34,4 +34,18 @@ public class BookController {
     ) {
         return libraryService.createBook(draft, authorId);
     }
+
+    @PutMapping("/{bookId}/author/{authorId}")
+    public Book updateBook (
+            @PathVariable Long bookId,
+            @PathVariable Long authorId,
+            @RequestBody BookDraft draft
+    ){
+        return libraryService.updateBook(bookId, draft, authorId);
+    }
+
+    @DeleteMapping("/{bookId}")
+    public boolean deleteBook(@PathVariable Long bookId) {
+        return libraryService.deleteBook(bookId);
+    }
 }

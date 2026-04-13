@@ -14,8 +14,8 @@ class StartupLocaleSelectorTest {
 
     @Test
     void selectsPolishWhenUserTypesPl() {
-        var io = new TestConsoleIO("pl");
-        var localeProvider = new FixedLocaleProvider();
+        TestConsoleIO io = new TestConsoleIO("pl");
+        FixedLocaleProvider localeProvider = new FixedLocaleProvider();
 
         StartupLocaleSelector selector = selector(io, localeProvider);
         selector.select();
@@ -25,8 +25,8 @@ class StartupLocaleSelectorTest {
 
     @Test
     void selectsEnglishWhenUserTypesEn() {
-        var io = new TestConsoleIO("en");
-        var localeProvider = new FixedLocaleProvider();
+        TestConsoleIO io = new TestConsoleIO("en");
+        FixedLocaleProvider localeProvider = new FixedLocaleProvider();
 
         selector(io, localeProvider).select();
 
@@ -35,8 +35,8 @@ class StartupLocaleSelectorTest {
 
     @Test
     void fallsBackToEnglishOnInvalidInputAndPrintsMessage() {
-        var io = new TestConsoleIO("xx");
-        var localeProvider = new FixedLocaleProvider();
+        TestConsoleIO io = new TestConsoleIO("xx");
+        FixedLocaleProvider localeProvider = new FixedLocaleProvider();
 
         selector(io, localeProvider).select();
 
@@ -50,7 +50,7 @@ class StartupLocaleSelectorTest {
     }
 
     private Translator translator(FixedLocaleProvider localeProvider) {
-        var messageSource = new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setFallbackToSystemLocale(false);
@@ -79,6 +79,11 @@ class StartupLocaleSelectorTest {
         public String readLine(String prompt) {
             out.append(prompt);
             return inputs.isEmpty() ? "" : inputs.removeFirst();
+        }
+
+        @Override
+        public void print(String message) {
+            System.out.println(message);
         }
 
         String printed() {

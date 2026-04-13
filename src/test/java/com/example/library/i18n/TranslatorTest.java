@@ -26,13 +26,13 @@ public class TranslatorTest {
     }
 
     private Translator translatorWithLocale(Locale locale) {
-        var messageSource = new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setFallbackToSystemLocale(false);
         messageSource.setUseCodeAsDefaultMessage(true);
 
-        var localeProvider = new FixedLocaleProvider();
+        FixedLocaleProvider localeProvider = new FixedLocaleProvider();
         localeProvider.setLocale(locale);
 
         return new Translator(messageSource, localeProvider);

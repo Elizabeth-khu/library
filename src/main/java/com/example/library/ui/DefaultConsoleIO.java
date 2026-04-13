@@ -19,4 +19,9 @@ public class DefaultConsoleIO implements ConsoleIO {
         System.out.print(prompt);
         return scanner.nextLine();
     }
+
+    @Override
+    public void print(String message) {
+        System.out.println(message);
+    }
 }

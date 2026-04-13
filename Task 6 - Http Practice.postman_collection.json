@@ -1,0 +1,97 @@
+{
+	"info": {
+		"_postman_id": "ee397476-4090-4c57-92dd-6b376ed7c265",
+		"name": "Task 6 - Http Practice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "53782830",
+		"_collection_link": "https://elizabeth-khu-268077.postman.co/workspace/Eliza's-Workspace~28425bbf-d276-46f6-80ec-7b7eaff42511/collection/53782830-ee397476-4090-4c57-92dd-6b376ed7c265?action=share&source=collection_link&creator=53782830"
+	},
+	"item": [
+		{
+			"name": "Get query params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://httpbin.org/get?user=eliza&role=intern",
+					"protocol": "https",
+					"host": [
+						"httpbin",
+						"org"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "user",
+							"value": "eliza"
+						},
+						{
+							"key": "role",
+							"value": "intern"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST JSON data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bookTitle\": \"Spring in Action\",\n    \"authorId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://httpbin.org/post",
+					"protocol": "https",
+					"host": [
+						"httpbin",
+						"org"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST form data",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "user",
+							"value": "Eliza",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://httpbin.org/post",
+					"protocol": "https",
+					"host": [
+						"httpbin",
+						"org"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

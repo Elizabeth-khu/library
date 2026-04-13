@@ -1,16 +1,12 @@
 package com.example.library;
 
-import com.example.library.config.AppConfig;
-import com.example.library.i18n.StartupLocaleSelector;
-import com.example.library.ui.ConsoleMenu;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
-        try (var ctx = new AnnotationConfigApplicationContext(AppConfig.class)) {
-            ctx.getBean(StartupLocaleSelector.class).select();
-            ctx.getBean(ConsoleMenu.class).run();
-        }
+        SpringApplication.run(Main.class, args);
     }
 }

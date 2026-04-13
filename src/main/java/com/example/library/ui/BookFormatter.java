@@ -32,7 +32,7 @@ public class BookFormatter {
                 ROW_FORMAT,
                 b.getId(),
                 cut(b.getTitle(), TITLE_WIDTH),
-                cut(b.getAuthor(), AUTHOR_WIDTH),
+                cut(b.getAuthorsAsString(), AUTHOR_WIDTH),
                 safeTrim(b.getDescription())
         );
     }

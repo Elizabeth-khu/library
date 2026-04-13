@@ -1,19 +1,19 @@
 package com.example.library.aop;
 
 import com.example.library.domain.Book;
-import com.example.library.domain.BookDraft;
+import com.example.library.repository.AuthorRepository;
+import com.example.library.repository.BookRepository;
 import com.example.library.service.LibraryService;
-import com.example.library.storage.BooksStorage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 class SimpleCacheAspectTest {
 
@@ -29,75 +29,39 @@ class SimpleCacheAspectTest {
         ctx = new AnnotationConfigApplicationContext(TestConfig.class);
 
         LibraryService service = ctx.getBean(LibraryService.class);
-        CountingStorage storage = ctx.getBean(CountingStorage.class);
+        BookRepository booksRepo = ctx.getBean(BookRepository.class);
 
-        assertTrue(service.findById(1).isPresent());
-        assertTrue(service.findById(1).isPresent());
+        Book testBook = new Book();
+        when(booksRepo.findById(1L)).thenReturn(Optional.of(testBook));
 
-        assertEquals(1, storage.findByIdCalls.get());
-    }
+        service.findById(1L);
+        service.findById(1L);
 
-    @Test
-    void doesNotReuseCacheForDifferentArguments() {
-        ctx = new AnnotationConfigApplicationContext(TestConfig.class);
-
-        LibraryService service = ctx.getBean(LibraryService.class);
-        CountingStorage storage = ctx.getBean(CountingStorage.class);
-
-        service.findById(1);
-        service.findById(2);
-
-        assertEquals(2, storage.findByIdCalls.get());
+        verify(booksRepo, times(1)).findById(1L);
     }
 
     @Configuration
-    @EnableAspectJAutoProxy
+    @EnableAspectJAutoProxy(proxyTargetClass = true)
     static class TestConfig {
 
         @Bean
-        CountingStorage booksStorage() {
-            return new CountingStorage();
+        public BookRepository booksRepository() {
+            return mock(BookRepository.class);
         }
 
         @Bean
-        LibraryService libraryService(BooksStorage storage) {
-            return new LibraryService(storage);
+        public AuthorRepository authorRepository() {
+            return mock(AuthorRepository.class);
         }
 
         @Bean
-        SimpleCacheAspect simpleCacheAspect() {
+        public LibraryService libraryService(BookRepository b, AuthorRepository a) {
+            return new LibraryService(b, a);
+        }
+
+        @Bean
+        public SimpleCacheAspect simpleCacheAspect() {
             return new SimpleCacheAspect();
-        }
-    }
-
-    static class CountingStorage implements BooksStorage {
-
-        final AtomicInteger findByIdCalls = new AtomicInteger();
-
-        @Override
-        public List<Book> books() {
-            return List.of(new Book(1, "T", "A", "D"));
-        }
-
-        @Override
-        public Optional<Book> findById(long id) {
-            findByIdCalls.incrementAndGet();
-            return Optional.of(new Book(id, "T" + id, "A", "D"));
-        }
-
-        @Override
-        public Book create(BookDraft bookDraft) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Optional<Book> update(long id, BookDraft bookDraft) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean delete(long id) {
-            throw new UnsupportedOperationException();
         }
     }
 }

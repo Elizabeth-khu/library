@@ -2,8 +2,7 @@ package com.example.library.aop;
 
 import com.example.library.domain.Book;
 import com.example.library.repository.AuthorRepository;
-import com.example.library.repository.hibernate.HibernateAuthorsRepository;
-import com.example.library.repository.hibernate.HibernateBooksRepository;
+import com.example.library.repository.BookRepository;
 import com.example.library.service.LibraryService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ class SimpleCacheAspectTest {
         ctx = new AnnotationConfigApplicationContext(TestConfig.class);
 
         LibraryService service = ctx.getBean(LibraryService.class);
-        HibernateBooksRepository booksRepo = ctx.getBean(HibernateBooksRepository.class);
+        BookRepository booksRepo = ctx.getBean(BookRepository.class);
 
         Book testBook = new Book();
         when(booksRepo.findById(1L)).thenReturn(Optional.of(testBook));
@@ -46,8 +45,8 @@ class SimpleCacheAspectTest {
     static class TestConfig {
 
         @Bean
-        public HibernateBooksRepository booksRepository() {
-            return mock(HibernateBooksRepository.class);
+        public BookRepository booksRepository() {
+            return mock(BookRepository.class);
         }
 
         @Bean
@@ -56,7 +55,7 @@ class SimpleCacheAspectTest {
         }
 
         @Bean
-        public LibraryService libraryService(HibernateBooksRepository b, AuthorRepository a) {
+        public LibraryService libraryService(BookRepository b, AuthorRepository a) {
             return new LibraryService(b, a);
         }
 

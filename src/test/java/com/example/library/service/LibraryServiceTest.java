@@ -4,7 +4,7 @@ import com.example.library.domain.Author;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.repository.AuthorRepository;
-import com.example.library.repository.hibernate.HibernateBooksRepository;
+import com.example.library.repository.BookRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 class LibraryServiceTest {
 
     @Mock
-    private HibernateBooksRepository booksRepository;
+    private BookRepository booksRepository;
 
     @Mock
     private AuthorRepository authorsRepository;

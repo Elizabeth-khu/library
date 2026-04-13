@@ -32,6 +32,11 @@ public class LibraryService {
         return booksRepository.findAll();
     }
 
+    @Transactional
+    public List<Author> listAuthors() {
+        return authorsRepository.findAll();
+    }
+
     @Cached
     @Transactional(readOnly = true)
     public Optional<Book> findById(long id) {

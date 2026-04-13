@@ -3,6 +3,7 @@ package com.example.library.controller;
 import com.example.library.domain.Book;
 import com.example.library.domain.BookDraft;
 import com.example.library.service.LibraryService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,13 @@ public class BookController {
     @GetMapping
     public List<Book> getAllBooks() {
         return libraryService.listBooks();
+    }
+
+    @GetMapping("/{bookId}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long bookId) {
+        return libraryService.findById(bookId)
+                .map(book -> ResponseEntity.ok(book))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
